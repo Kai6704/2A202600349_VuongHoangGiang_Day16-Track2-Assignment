@@ -1,0 +1,12 @@
+{
+  "load_time_s": 0.37,
+  "train_time_s": 2.3426,
+  "best_iter": 14,
+  "auc": 0.501641,
+  "accuracy": 0.844142,
+  "f1": 0.004485,
+  "precision": 0.002268,
+  "recall": 0.204082,
+  "lat_1row_ms": 0.5028,
+  "lat_1000rows_ms": 1.0362
+}
