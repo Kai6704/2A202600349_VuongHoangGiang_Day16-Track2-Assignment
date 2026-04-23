@@ -1,0 +1,34 @@
+BÁO CÁO LAB 16 — Phương án CPU thay thế (LightGBM trên GCP)
+=============================================================
+
+1. LÝ DO DÙNG CPU THAY GPU:
+Tài khoản GCP mới bị khóa GPU quota mặc định = 0 cho mọi Project mới.
+Yêu cầu tăng quota NVIDIA T4 chưa được duyệt trong thời gian làm lab,
+nên chuyển sang phương án CPU instance theo hướng dẫn Phần 7.
+
+2. CẤU HÌNH TRIỂN KHAI:
+- Instance : n2-standard-8 (8 vCPU, 32 GB RAM)
+- Region   : us-central1-a (Google Cloud)
+- IaC      : Terraform (VPC + Cloud NAT + External Load Balancer)
+- Kết nối  : IAP TCP Forwarding (không cần Bastion Host riêng)
+
+3. KẾT QUẢ BENCHMARK (LightGBM — Credit Card Fraud Detection):
+- Load data       : 0.37s  (284,807 rows, 30 features)
+- Training time   : 2.34s  (early stopping tại iteration 14)
+- AUC-ROC         : 0.5016 (data tổng hợp random, không có pattern thực)
+- Accuracy        : 0.8441
+- F1-Score        : 0.0045
+- Inference 1 row : 0.50ms
+- Inference 1000  : 1.04ms
+
+4. CHI PHÍ ƯỚC TÍNH (us-central1, 1 giờ):
+- Compute Engine n2-standard-8 : ~$0.382/giờ
+- Cloud NAT                     : ~$0.044/giờ
+- Cloud Load Balancing          : ~$0.008/giờ
+- Tổng                          : ~$0.43/giờ
+
+5. SO SÁNH VỚI GPU:
+Instance n1-standard-4 + NVIDIA T4 tốn ~$0.54/giờ và cần chờ quota.
+Phương án CPU n2-standard-8 rẻ hơn (~$0.43/giờ) và sẵn sàng ngay.
+Kết luận: CPU phù hợp cho tabular ML (LightGBM/XGBoost). GPU chỉ cần
+thiết cho deep learning (LLM, Transformer) với tính toán ma trận lớn.
